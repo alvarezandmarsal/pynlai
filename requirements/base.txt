@@ -1,6 +1,8 @@
+click>=6.7
 cryptography>=1.7
-PyYAML>=3.11
-
-
 pip>=8.1.2
+PyYAML>=3.11
 six>=1.10.0
+
+spacy>=1.8.2
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-1.2.0/en_core_web_sm-1.2.0.tar.gz

@@ -12,18 +12,16 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'Click',
+    'click',
     'six',
-    # TODO: put package requirements here
+    'spacy',
 ]
 
 setup_requirements = [
-    # TODO(ChrisPappalardo): put setup requirements (distutils extensions, etc.) here
 ]
 
 test_requirements = [
     'mock',
-    # TODO: put package test requirements here
 ]
 
 setup(

@@ -5,9 +5,8 @@
 test
 ----
 
-unit tests for pynlai package
+core unit tests for pynlai package
 '''
-
 
 
 import unittest
@@ -17,7 +16,7 @@ from pynlai import pynlai
 from pynlai import cli
 
 
-class TestPynlai(unittest.TestCase):
+class Test(unittest.TestCase):
 
     def setUp(self):
         self.runner = CliRunner()
@@ -25,12 +24,16 @@ class TestPynlai(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_000_something(self):
-        self.assertTrue(True)
-
     def test_command_line_interface(self):
-        result = self.runner.invoke(cli.main)
+        result = self.runner.invoke(
+            cli.main,
+            catch_exceptions=False,
+        )
         self.assertEqual(result.exit_code, 0)
-        result = self.runner.invoke(cli.main, ['--help'])
+        result = self.runner.invoke(
+            cli.main,
+            ['--help'],
+            catch_exceptions=False,
+        )
         self.assertEqual(result.exit_code, 0)
-        self.assertTrue('--help  Show this message' in result.output)
+        self.assertTrue('Show this message and exit' in result.output)
