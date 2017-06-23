@@ -1,0 +1,6 @@
+cryptography>=1.7
+PyYAML>=3.11
+
+
+pip>=8.1.2
+six>=1.10.0

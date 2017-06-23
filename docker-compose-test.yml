@@ -1,0 +1,17 @@
+version: '3'
+
+volumes:
+  data_test: {}
+
+services:
+  pynlai:
+    build:
+      context: .
+      dockerfile: ./compose/pynlai/Dockerfile-test
+    environment:
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
+    image: pynlai:test
+    volumes:
+      - .:/app
+      - data_test:/data

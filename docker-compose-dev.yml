@@ -1,0 +1,17 @@
+version: '3'
+
+volumes:
+  data_dev: {}
+
+services:
+  pynlai:
+    build:
+      context: .
+      dockerfile: ./compose/pynlai/Dockerfile-dev
+    environment:
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
+    image: pynlai:dev
+    volumes:
+      - .:/app
+      - data_dev:/data
