@@ -12,7 +12,6 @@ console script for pynlai.
 import pprint
 
 import click
-import spacy
 import en_core_web_sm as en
 
 from pynlai import core

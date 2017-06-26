@@ -12,7 +12,7 @@ core unit tests for pynlai package
 import unittest
 from click.testing import CliRunner
 
-from pynlai import pynlai
+from pynlai import core
 from pynlai import cli
 
 
@@ -24,12 +24,14 @@ class Test(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_command_line_interface(self):
+    def test_cli(self):
         result = self.runner.invoke(
             cli.main,
             catch_exceptions=False,
         )
         self.assertEqual(result.exit_code, 0)
+
+    def test_cli_help(self):
         result = self.runner.invoke(
             cli.main,
             ['--help'],
@@ -37,3 +39,6 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(result.exit_code, 0)
         self.assertTrue('Show this message and exit' in result.output)
+
+    def test_cli_parse(self):
+        pass

@@ -9,10 +9,10 @@ unit tests for pynlai package parsing functionality
 '''
 
 
+import six
 import unittest
-from click.testing import CliRunner
 
-import spacy
+from click.testing import CliRunner
 import en_core_web_sm as en
 
 from pynlai import core
@@ -44,4 +44,4 @@ class TestParse(unittest.TestCase):
             'NOUN',  # sentence
             'PUNCT', # .
         )
-        self.assertItemsEqual(r, pos)
+        six.assertCountEqual(self, r, pos)
