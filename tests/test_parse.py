@@ -36,12 +36,12 @@ class TestParse(unittest.TestCase):
     def test_sent_to_pos(self):
         s = u'This is a test sentence.'
         r = core.sent_to_pos(s, self.nlp)
-        pos = (
-            'DET',   # This
-            'VERB',  # is
-            'DET',   # a
-            'NOUN',  # test
-            'NOUN',  # sentence
-            'PUNCT', # .
-        )
+        pos = [
+            ('This', 'this', 'DET'),
+            ('is', 'be', 'VERB'),
+            ('a', 'a', 'DET'),
+            ('test', 'test', 'NOUN'),
+            ('sentence', 'sentence', 'NOUN'),
+            ('.', '.', 'PUNCT'),
+        ]
         six.assertCountEqual(self, r, pos)
