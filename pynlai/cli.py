@@ -18,7 +18,7 @@ from pynlai import core
 
 
 funcs = {
-    'sent_to_pos': core.sent_to_pos,
+    'pos': core.sent_to_pos,
 }
 nlp = en.load()
 pp = pprint.PrettyPrinter(indent=4)
@@ -27,7 +27,7 @@ pp = pprint.PrettyPrinter(indent=4)
 @click.group()
 @click.option(
     '--pipeline',
-    default=('sent_to_pos',),
+    default=('pos',),
     multiple=True,
     type=click.Choice(funcs.keys()),
     help='function(s) to use for processing pipeline',
@@ -50,8 +50,17 @@ def parse(ctx, sent):
     parse a sentence
     '''
 
-    click.echo(pp.pprint([r(sent) for r in ctx.obj['pipeline']]))
+    for f in ctx.obj['pipeline']:
+        click.echo(pp.pprint(f(sent, nlp)))
+
+
+def entry_point():
+    '''
+    required to make setuptools and click play nicely (context object)
+    '''
+
+    return main(obj={})
 
 
 if __name__ == "__main__":
-    main(obj={})
+    entry_point()

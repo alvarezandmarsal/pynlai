@@ -35,7 +35,7 @@ setup(
     packages=find_packages(include=['pynlai']),
     entry_points={
         'console_scripts': [
-            'pynlai=pynlai.cli:main'
+            'pynlai=pynlai.cli:entry_point'
         ]
     },
     include_package_data=True,
