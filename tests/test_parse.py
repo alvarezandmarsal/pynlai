@@ -19,9 +19,10 @@ from pynlai import core
 from pynlai import cli
 
 
-class TestParse(unittest.TestCase):
+nlp = en.load()
 
-    nlp = en.load()
+
+class TestParse(unittest.TestCase):
 
     def setUp(self):
         self.runner = CliRunner()
@@ -31,17 +32,17 @@ class TestParse(unittest.TestCase):
 
     def test_pipeline(self):
         s = u'This is a test sentence.'
-        self.assertEqual(len(self.nlp(s)), 6)
+        self.assertEqual(len(nlp(s)), 6)
 
     def test_sent_to_pos(self):
         s = u'This is a test sentence.'
-        r = core.sent_to_pos(s, self.nlp)
+        r = core.sent_to_pos(s, nlp)
         pos = [
-            ('This', 'this', 'DET'),
-            ('is', 'be', 'VERB'),
-            ('a', 'a', 'DET'),
-            ('test', 'test', 'NOUN'),
-            ('sentence', 'sentence', 'NOUN'),
-            ('.', '.', 'PUNCT'),
+            ['This', 552, 'this', 88, 'DET'],
+            ['is', 536, 'be', 98, 'VERB'],
+            ['a', 506, 'a', 88, 'DET'],
+            ['test', 1877, 'test', 90, 'NOUN'],
+            ['sentence', 2499, 'sentence', 90, 'NOUN'],
+            ['.', 453, '.', 95, 'PUNCT'],
         ]
         six.assertCountEqual(self, r, pos)
