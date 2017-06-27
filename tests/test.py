@@ -5,7 +5,7 @@
 test
 ----
 
-core unit tests for pynlai package
+unit tests for pynlai package
 '''
 
 

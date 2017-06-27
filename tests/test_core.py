@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 '''
-test_parse
-----------
+test_core
+---------
 
-unit tests for pynlai package parsing functionality
+unit tests for pynlai package core functionality
 '''
 
 
@@ -22,7 +22,7 @@ from pynlai import cli
 nlp = en.load()
 
 
-class TestParse(unittest.TestCase):
+class TestCore(unittest.TestCase):
 
     def setUp(self):
         self.runner = CliRunner()
@@ -30,7 +30,7 @@ class TestParse(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_pipeline(self):
+    def test_nlp(self):
         s = u'This is a test sentence.'
         self.assertEqual(len(nlp(s)), 6)
 
@@ -46,3 +46,13 @@ class TestParse(unittest.TestCase):
             ['.', 453, '.', 95, 'PUNCT'],
         ]
         six.assertCountEqual(self, r, pos)
+
+    def test_sent_to_deps(self):
+        s = u'I like green eggs and ham.'
+        r = core.sent_to_deps(s, nlp)
+        deps = [
+            ['I', 'I', 'nsubj', 'like'],
+            ['green eggs', 'eggs', 'dobj', 'like'],
+            ['ham', 'ham', 'conj', 'eggs'],
+        ]
+        six.assertCountEqual(self, r, deps)
