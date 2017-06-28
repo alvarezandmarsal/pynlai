@@ -12,24 +12,41 @@ core functions and classes for pynlai.
 from operator import attrgetter
 import six
 
+from spacy.symbols import nsubj, VERB
+
 
 _POS_FIELDS = (
     'text',
-    'lemma',
     'lemma_',
-    'pos',
     'pos_'
 )
 
 _DEP_FIELDS = (
     'text',
     'root.text',
-    'root.dep',
     'root.dep_',
     'root.head.text',
-    'root.head.lemma',
+    'root.head.pos_',
     'root.head.lemma_',
 )
+
+
+def sent_to_dep(sent, nlp, fs=None):
+    '''
+    returns noun chunks from spacy syntactic dependency parser
+    requires pre-instantiated spacy nlp obj for performance
+    see https://spacy.io/docs/usage/dependency-parse
+    '''
+
+    if type(sent) is not six.text_type:
+        sent = six.u(sent)
+
+    if not fs:
+        fs = _DEP_FIELDS
+
+    doc = nlp(sent)
+
+    return [[attrgetter(f)(nc) for f in fs] for nc in doc.noun_chunks]
 
 
 def sent_to_pos(sent, nlp, fs=None):
@@ -50,19 +67,28 @@ def sent_to_pos(sent, nlp, fs=None):
     return [[attrgetter(f)(w) for f in fs] for w in doc]
 
 
-def sent_to_deps(sent, nlp, fs=None):
+def sent_to_sub(sent, nlp, fs=None):
     '''
-    returns noun chunks from spacy syntactic dependency parser
-    requires pre-instantiated spacy nlp obj for performance
-    see https://spacy.io/docs/usage/dependency-parse
+    finds the subject(s) of the sentence, which is the noun that is
+    performing the verb(s) in the sentence; returns dict of subj:[verbs]
     '''
 
     if type(sent) is not six.text_type:
         sent = six.u(sent)
 
     if not fs:
-        fs = _DEP_FIELDS
+        fs = _POS_FIELDS
 
     doc = nlp(sent)
 
-    return [[attrgetter(f)(nc) for f in fs] for nc in doc.noun_chunks]
+    res = dict()
+
+    for w in doc:
+        if w.dep == nsubj and w.head.pos == VERB:
+            fields = [attrgetter(f)(w) for f in fs]
+            verbs = res.get(tuple(fields), [])
+            verbs.append((w.head.i, w.head.text))
+
+            res[tuple(fields)] = verbs
+
+    return res

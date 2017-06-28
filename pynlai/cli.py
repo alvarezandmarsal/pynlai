@@ -18,8 +18,9 @@ from pynlai import core
 
 
 funcs = {
-    'deps': core.sent_to_deps,
+    'dep': core.sent_to_dep,
     'pos': core.sent_to_pos,
+    'sub': core.sent_to_sub,
 }
 
 pp = pprint.PrettyPrinter(indent=4)

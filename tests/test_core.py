@@ -34,25 +34,33 @@ class TestCore(unittest.TestCase):
         s = u'This is a test sentence.'
         self.assertEqual(len(nlp(s)), 6)
 
+    def test_sent_to_dep(self):
+        s = u'I like green eggs and ham.'
+        r = core.sent_to_dep(s, nlp)
+        dep = [
+            ['I', 'I', 'nsubj', 'like', 'VERB', 'like'],
+            ['green eggs', 'eggs', 'dobj', 'like', 'VERB', 'like'],
+            ['ham', 'ham', 'conj', 'eggs', 'NOUN', 'egg'],
+        ]
+        six.assertCountEqual(self, r, dep)
+
     def test_sent_to_pos(self):
         s = u'This is a test sentence.'
         r = core.sent_to_pos(s, nlp)
         pos = [
-            ['This', 552, 'this', 88, 'DET'],
-            ['is', 536, 'be', 98, 'VERB'],
-            ['a', 506, 'a', 88, 'DET'],
-            ['test', 1877, 'test', 90, 'NOUN'],
-            ['sentence', 2499, 'sentence', 90, 'NOUN'],
-            ['.', 453, '.', 95, 'PUNCT'],
+            ['This', 'this', 'DET'],
+            ['is', 'be', 'VERB'],
+            ['a', 'a', 'DET'],
+            ['test', 'test', 'NOUN'],
+            ['sentence', 'sentence', 'NOUN'],
+            ['.', '.', 'PUNCT'],
         ]
         six.assertCountEqual(self, r, pos)
 
-    def test_sent_to_deps(self):
-        s = u'I like green eggs and ham.'
-        r = core.sent_to_deps(s, nlp)
-        deps = [
-            ['I', 'I', 425, 'nsubj', 'like', 570, 'like'],
-            ['green eggs', 'eggs', 412, 'dobj', 'like', 570, 'like'],
-            ['ham', 'ham', 406, 'conj', 'eggs', 5480, 'egg'],
-        ]
-        six.assertCountEqual(self, r, deps)
+    def test_sent_to_sub(self):
+        s = u'I like green eggs and ham,'
+        r = core.sent_to_sub(s, nlp)
+        sub = {
+            ('I', '-PRON-', 'PRON'): [(1, 'like')],
+        }
+        six.assertCountEqual(self, r, sub)

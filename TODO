@@ -1,0 +1,4 @@
+TODO
+----
+
+* (6/28/17, 1) Refactor core functions into classes that return codes or strings, depending on how they're called (cli vs. programmatically)
