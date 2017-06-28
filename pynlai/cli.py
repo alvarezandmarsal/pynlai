@@ -19,6 +19,7 @@ from pynlai import core
 
 funcs = {
     'dep': core.sent_to_dep,
+    'obj': core.sent_to_obj,
     'pos': core.sent_to_pos,
     'sub': core.sent_to_sub,
 }

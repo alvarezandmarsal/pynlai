@@ -44,6 +44,14 @@ class TestCore(unittest.TestCase):
         ]
         six.assertCountEqual(self, r, dep)
 
+    def test_sent_to_obj(self):
+        s = u'I like green eggs and ham,'
+        r = core.sent_to_obj(s, nlp)
+        sub = {
+            ('eggs', 'egg', 'NOUN'): [('like', 'like', 'VERB')],
+        }
+        six.assertCountEqual(self, r, sub)
+
     def test_sent_to_pos(self):
         s = u'This is a test sentence.'
         r = core.sent_to_pos(s, nlp)
@@ -61,6 +69,6 @@ class TestCore(unittest.TestCase):
         s = u'I like green eggs and ham,'
         r = core.sent_to_sub(s, nlp)
         sub = {
-            ('I', '-PRON-', 'PRON'): [(1, 'like')],
+            ('I', '-PRON-', 'PRON'): [('like', 'like', 'VERB')],
         }
         six.assertCountEqual(self, r, sub)
