@@ -51,8 +51,8 @@ class TestCore(unittest.TestCase):
         s = u'I like green eggs and ham.'
         r = core.sent_to_deps(s, nlp)
         deps = [
-            ['I', 'I', 'nsubj', 'like'],
-            ['green eggs', 'eggs', 'dobj', 'like'],
-            ['ham', 'ham', 'conj', 'eggs'],
+            ['I', 'I', 425, 'nsubj', 'like', 570, 'like'],
+            ['green eggs', 'eggs', 412, 'dobj', 'like', 570, 'like'],
+            ['ham', 'ham', 406, 'conj', 'eggs', 5480, 'egg'],
         ]
         six.assertCountEqual(self, r, deps)

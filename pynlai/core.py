@@ -13,7 +13,26 @@ from operator import attrgetter
 import six
 
 
-def sent_to_pos(sent, nlp, pos=None):
+_POS_FIELDS = (
+    'text',
+    'lemma',
+    'lemma_',
+    'pos',
+    'pos_'
+)
+
+_DEP_FIELDS = (
+    'text',
+    'root.text',
+    'root.dep',
+    'root.dep_',
+    'root.head.text',
+    'root.head.lemma',
+    'root.head.lemma_',
+)
+
+
+def sent_to_pos(sent, nlp, fs=None):
     '''
     returns lemma and parts-of-speech from spacy POS tagger
     requires pre-instantiated spacy nlp obj for performance
@@ -23,15 +42,15 @@ def sent_to_pos(sent, nlp, pos=None):
     if type(sent) is not six.text_type:
         sent = six.u(sent)
 
-    if not pos:
-        pos = ('text', 'lemma', 'lemma_', 'pos', 'pos_')
+    if not fs:
+        fs = _POS_FIELDS
 
     doc = nlp(sent)
 
-    return [[attrgetter(p)(w) for p in pos] for w in doc]
+    return [[attrgetter(f)(w) for f in fs] for w in doc]
 
 
-def sent_to_deps(sent, nlp, deps=None):
+def sent_to_deps(sent, nlp, fs=None):
     '''
     returns noun chunks from spacy syntactic dependency parser
     requires pre-instantiated spacy nlp obj for performance
@@ -41,9 +60,9 @@ def sent_to_deps(sent, nlp, deps=None):
     if type(sent) is not six.text_type:
         sent = six.u(sent)
 
-    if not deps:
-        deps = ('text', 'root.text', 'root.dep_', 'root.head.text')
+    if not fs:
+        fs = _DEP_FIELDS
 
     doc = nlp(sent)
 
-    return [[attrgetter(d)(nc) for d in deps] for nc in doc.noun_chunks]
+    return [[attrgetter(f)(nc) for f in fs] for nc in doc.noun_chunks]
