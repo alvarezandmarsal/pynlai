@@ -13,15 +13,16 @@ import pprint
 from six.moves import input
 
 import click
+import en_core_web_sm as en
 
 from pynlai import core
 
 
 funcs = {
-    'dep': core.sent_to_dep,
-    'obj': core.sent_to_obj,
-    'pos': core.sent_to_pos,
-    'sub': core.sent_to_sub,
+    'dep': core.to_dep,
+    'obj': core.to_obj,
+    'pos': core.to_pos,
+    'sub': core.to_sub,
 }
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -59,8 +60,6 @@ def parse(ctx, sent):
     parse a sentence
     '''
 
-    # this buried import makes unit testing faster
-    import en_core_web_sm as en
     nlp = en.load()
 
     while True:
@@ -70,7 +69,7 @@ def parse(ctx, sent):
         try:
 
             for f in ctx.obj['pipeline']:
-                click.echo(pp.pprint(f(sent, nlp)))
+                click.echo(pp.pprint(f(sent=sent, nlp=nlp)))
 
             if not ctx.obj['i']:
                 break
