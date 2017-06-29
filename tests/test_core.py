@@ -14,6 +14,7 @@ import unittest
 
 from click.testing import CliRunner
 import en_core_web_sm as en
+from spacy.tokens import Doc
 
 from pynlai import core
 from pynlai import cli
@@ -30,8 +31,24 @@ class TestCore(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_nlp_preprocess(self):
+        try:
+            core.to_dep('Test.', nlp)
+        except ValueError as e:
+            self.assertTrue('pass args by name' in str(e))
+        try:
+            core.to_dep(nlp=nlp)
+        except ValueError as e:
+            self.assertTrue('pass either sent or doc' in str(e))
+        try:
+            core.to_dep(doc='Test.')
+        except ValueError as e:
+            self.assertTrue('doc must be of type' in str(e))
+        r = core.to_dep(doc=Doc(nlp.vocab))
+        six.assertCountEqual(self, r, [])
+
     def test_to_dep(self):
-        s = u'I like green eggs and ham.'
+        s = 'I like green eggs and ham.'
         r = core.to_dep(sent=s, nlp=nlp)
         dep = [
             ['I', 'I', 'nsubj', 'like', 'VERB', 'like'],
@@ -41,7 +58,7 @@ class TestCore(unittest.TestCase):
         six.assertCountEqual(self, r, dep)
 
     def test_to_ent(self):
-        s = u'London is a big city in the United Kingdom.'
+        s = 'London is a big city in the United Kingdom.'
         r = core.to_ent(sent=s, nlp=nlp)
         ent = [
             ['London', 'GPE'],
@@ -50,7 +67,7 @@ class TestCore(unittest.TestCase):
         six.assertCountEqual(self, r, ent)
 
     def test_to_obj(self):
-        s = u'I like green eggs and ham,'
+        s = 'I like green eggs and ham,'
         r = core.to_obj(sent=s, nlp=nlp)
         sub = {
             ('eggs', 'egg', 'NOUN'): [('like', 'like', 'VERB')],
@@ -58,7 +75,7 @@ class TestCore(unittest.TestCase):
         six.assertCountEqual(self, r, sub)
 
     def test_to_pos(self):
-        s = u'This is a test sentence.'
+        s = 'This is a test sentence.'
         r = core.to_pos(sent=s, nlp=nlp)
         pos = [
             ['This', 'this', 'DET'],
@@ -71,7 +88,7 @@ class TestCore(unittest.TestCase):
         six.assertCountEqual(self, r, pos)
 
     def test_to_sub(self):
-        s = u'I like green eggs and ham,'
+        s = 'I like green eggs and ham,'
         r = core.to_sub(sent=s, nlp=nlp)
         sub = {
             ('I', '-PRON-', 'PRON'): [('like', 'like', 'VERB')],

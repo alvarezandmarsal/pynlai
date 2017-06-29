@@ -58,8 +58,11 @@ def nlp_preprocess(nlp_model, flds_default):
             if 'sent' not in kwargs and 'doc' not in kwargs:
                 raise ValueError('pass either sent or doc to %s' % name)
 
+            if 'doc' in kwargs and type(kwargs['doc']) is not Doc:
+                raise ValueError('doc must be of type %s' % type(Doc))
+
             # pre-processors
-            sent = kwargs.get('sent', '')
+            sent = kwargs.get('sent', bytes())
             if type(sent) is not six.text_type:
                 kwargs['sent'] = six.u(sent)
 
@@ -70,6 +73,8 @@ def nlp_preprocess(nlp_model, flds_default):
             doc = kwargs.get('doc', None)
             if type(doc) is not Doc:
                 kwargs['doc'] = kwargs['nlp'](kwargs['sent'])
+            else:
+                kwargs['sent'] = kwargs['doc'].text
 
             kwargs.setdefault('flds', flds_default)
 
