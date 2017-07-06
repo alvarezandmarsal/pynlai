@@ -50,6 +50,7 @@ def main(ctx, interactive, pipeline):
     pipeline = [funcs[k] for k in pipeline]
     ctx.obj['i'] = interactive
     ctx.obj['pipeline'] = pipeline
+    ctx.obj['nlp'] = en.load()
 
 
 @main.command()
@@ -60,7 +61,7 @@ def parse(ctx, sent):
     parse a sentence
     '''
 
-    nlp = en.load()
+    nlp = ctx.obj['nlp']
 
     while True:
 
@@ -76,6 +77,25 @@ def parse(ctx, sent):
 
         except KeyboardInterrupt:
             break
+
+
+@main.command()
+@click.pass_context
+@click.argument('file')
+def parsefile(ctx, file):
+    '''
+    parse a document
+    '''
+
+    nlp = ctx.obj['nlp']
+
+    with open(file, 'r') as f:
+
+        doc = nlp(f.read())
+
+        for sent in doc.sents:
+            click.echo(sent.text)
+            ctx.invoke(parse, sent=sent.text)
 
 
 def entry_point():

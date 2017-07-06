@@ -1,4 +1,6 @@
 TODO
 ----
 
-* (6/28/17, 1) Refactor core functions into classes that return codes or strings, depending on how they're called (cli vs. programmatically)
+* (06/28/17, 1)  Refactor core functions into classes that return codes or strings, depending on how they're called (cli vs. programmatically).
+* (07/05/17, 1)  Create syntactic dependency parse matcher framework that is OO, trainable, persistent, and composable.
+

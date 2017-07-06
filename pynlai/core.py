@@ -4,7 +4,6 @@
 core
 ----
 
-
 core functions and classes for pynlai.
 '''
 
