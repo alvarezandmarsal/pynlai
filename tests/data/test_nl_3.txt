@@ -1,0 +1,1 @@
+Simulate TARGA price paths going out 2 years on a daily basis.  Iterate 100,000 times.  Use the attached comps.
