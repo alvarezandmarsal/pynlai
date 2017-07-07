@@ -15,18 +15,32 @@ from six.moves import input
 import click
 import en_core_web_sm as en
 
-from pynlai import core
+from pynlai.core import (
+    create_view,
+    to_ent,
+    to_nc,
+    to_obj,
+    to_pos,
+    to_sub,
+)
+
+from pynlai.views import (
+    _DEP_SPAN,
+    _DEP_TOKEN,
+    _ENT_SPAN,
+    _POS_TOKEN,
+)
 
 
-funcs = {
-    'dep': core.to_dep,
-    'ent': core.to_ent,
-    'obj': core.to_obj,
-    'pos': core.to_pos,
-    'sub': core.to_sub,
+func_view = {
+    'ent': (to_ent, _ENT_SPAN['HR']),
+    'nc': (to_nc, _DEP_SPAN['HR']),
+    'obj': (to_obj, _DEP_TOKEN['HR']),
+    'pos': (to_pos, _POS_TOKEN['HR']),
+    'sub': (to_sub, _DEP_TOKEN['HR']),
 }
 
-pp = pprint.PrettyPrinter(indent=4)
+pp = pprint.PrettyPrinter(indent=2, width=240)
 
 
 @click.group()
@@ -40,17 +54,16 @@ pp = pprint.PrettyPrinter(indent=4)
     '--pipeline',
     default=('pos',),
     multiple=True,
-    type=click.Choice(funcs.keys()),
-    help='function(s) to use for processing pipeline'
+    type=click.Choice(func_view.keys()),
+    help='function(s) and view(s) to use for processing pipeline'
 )
 def main(ctx, interactive, pipeline):
     '''
     pynlai command line interface
     '''
 
-    pipeline = [funcs[k] for k in pipeline]
     ctx.obj['i'] = interactive
-    ctx.obj['pipeline'] = pipeline
+    ctx.obj['pipeline'] = [func_view[k] for k in pipeline]
     ctx.obj['nlp'] = en.load()
 
 
@@ -70,8 +83,9 @@ def parse(ctx, sent):
 
         try:
 
-            for f in ctx.obj['pipeline']:
-                click.echo(pp.pprint(f(sent=sent, nlp=nlp)))
+            for f, v in ctx.obj['pipeline']:
+                r = [create_view(e, v) for e in f(doc=sent, nlp=nlp)]
+                click.echo(pp.pprint((f.__name__, r)))
 
             if not ctx.obj['i']:
                 break

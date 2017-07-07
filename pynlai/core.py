@@ -8,76 +8,63 @@ core functions and classes for pynlai.
 '''
 
 
+from collections import OrderedDict
+from functools import wraps
 from operator import attrgetter
 import six
 
-import en_core_web_sm as en
 from spacy.en import English
 from spacy.tokens import Doc
 from spacy.symbols import dobj, nsubj, VERB
 
 
-_DEP_FIELDS = (
-    'text',
-    'root.text',
-    'root.dep_',
-    'root.head.text',
-    'root.head.pos_',
-    'root.head.lemma_',
-)
-
-_ENT_FIELDS = (
-    'text',
-    'label_',
-)
-
-_POS_FIELDS = (
-    'text',
-    'lemma_',
-    'pos_'
-)
-
-
-def nlp_preprocess(nlp_model, flds_default):
+def create_view(obj, view):
     '''
-    a decorator to pre-process kwargs passed to nlp functions
-    provides optional nlp arg to all decorated functions
+    filters object through view fields and returns field: value dict
+    '''
+
+    return OrderedDict([(f, attrgetter(f)(obj)) for f in view])
+
+
+def nlp_preprocess(nlp_model):
+    '''
+    a decorator to pre-process text passed to nlp functions
+    requires keyword args that at least contain doc and nlp
     '''
 
     def decorator(fcn):
 
+        @wraps(fcn)
         def wrapper(*args, **kwargs):
 
             name = fcn.__name__
+
+            kwargs.setdefault('doc', None)
+            kwargs.setdefault('nlp', None)
 
             # validations
             if args:
                 raise ValueError('pass args by name to %s' % name)
 
-            if 'sent' not in kwargs and 'doc' not in kwargs:
-                raise ValueError('pass either sent or doc to %s' % name)
+            if type(kwargs['doc']) not in (Doc, str, six.text_type):
+                m = 'must pass `doc` arg of text type or %s'
+                raise ValueError(m % type(Doc))
 
-            if 'doc' in kwargs and type(kwargs['doc']) is not Doc:
-                raise ValueError('doc must be of type %s' % type(Doc))
+            if type(kwargs['nlp']) is not nlp_model:
+                m = 'must pass `nlp` arg of type %s'
+                raise ValueError(m % nlp_model)
 
             # pre-processors
-            sent = kwargs.get('sent', bytes())
-            if type(sent) is not six.text_type:
-                kwargs['sent'] = six.u(sent)
+            if type(kwargs['doc']) is Doc:
+                pass
 
-            nlp = kwargs.get('nlp', None)
-            if type(nlp) is not nlp_model:
-                kwargs['nlp'] = en.load()
+            elif type(kwargs['doc']) is six.text_type:
+                kwargs['doc'] = kwargs['nlp'](kwargs['doc'])
 
-            doc = kwargs.get('doc', None)
-            if type(doc) is not Doc:
-                kwargs['doc'] = kwargs['nlp'](kwargs['sent'])
             else:
-                kwargs['sent'] = kwargs['doc'].text
+                kwargs['doc'] = kwargs['nlp'](six.u(kwargs['doc']))
 
-            kwargs.setdefault('flds', flds_default)
-
-            # call decorated function with pre-processed kwargs
+            # call decorated function using pre-processed kwargs
             return fcn(**kwargs)
 
         return wrapper
@@ -85,77 +72,61 @@ def nlp_preprocess(nlp_model, flds_default):
     return decorator
 
 
-@nlp_preprocess(English, _DEP_FIELDS)
-def find_dep(nlp, sent, doc, dep, pos, flds):
+@nlp_preprocess(English)
+def find_dep(doc, dep, pos, **kwargs):
     '''
     finds dependencies in the sentence matching dep and (head) pos
-    returns dict of deps: list(heads) where each is a tuple of fields
+    returns list of matching tokens
     '''
 
-    res = dict()
-
-    for w in doc:
-        if w.dep == dep and w.head.pos == pos:
-            d_fields = [attrgetter(f)(w) for f in flds]
-            h_fields = [attrgetter(f)(w.head) for f in flds]
-            heads = res.get(tuple(d_fields), [])
-            heads.append(h_fields)
-
-            res[tuple(d_fields)] = heads
-
-    return res
+    return [t for t in doc if t.dep == dep and t.head.pos == pos]
 
 
-@nlp_preprocess(English, _DEP_FIELDS)
-def to_dep(nlp, sent, doc, flds):
-    '''
-    returns noun chunks from spacy syntactic dependency parser
-    requires a sentence (sent) or an nlp document (doc)
-    see https://spacy.io/docs/usage/dependency-parse
-    '''
-
-    return [[attrgetter(f)(nc) for f in flds] for nc in doc.noun_chunks]
-
-
-@nlp_preprocess(English, _ENT_FIELDS)
-def to_ent(nlp, sent, doc, flds):
+@nlp_preprocess(English)
+def to_ent(doc, **kwargs):
     '''
     returns entities and annotations
-    requires a sentence (sent) or an nlp document (doc)
     see https://spacy.io/docs/usage/entity-recognition
     '''
 
-    return [[attrgetter(f)(e) for f in flds] for e in doc.ents]
+    return [ent for ent in doc.ents]
 
 
-@nlp_preprocess(English, _POS_FIELDS)
-def to_obj(nlp, sent, doc, flds):
+@nlp_preprocess(English)
+def to_nc(doc, **kwargs):
+    '''
+    returns noun chunks using spacy syntactic dependency parser
+    see https://spacy.io/docs/usage/dependency-parse
+    '''
+
+    return [nc for nc in doc.noun_chunks]
+
+
+@nlp_preprocess(English)
+def to_obj(doc, **kwargs):
     '''
     finds the objects(s) of the sentence, which is the noun that is
     the recipient of a verb action
-    requires a sentence (sent) or an nlp document (doc)
     '''
 
-    return find_dep(dep=dobj, pos=VERB, **vars())
+    return find_dep(doc=doc, dep=dobj, pos=VERB, **kwargs)
 
 
-@nlp_preprocess(English, _POS_FIELDS)
-def to_pos(nlp, sent, doc, flds):
+@nlp_preprocess(English)
+def to_pos(doc, **kwargs):
     '''
     returns parts of speech from spacy POS tagger
-    requires a sentence (sent) or an nlp document (doc)
     see https://spacy.io/docs/usage/pos-tagging
     '''
 
-    return [[attrgetter(f)(w) for f in flds] for w in doc]
+    return [word_token for word_token in doc]
 
 
-@nlp_preprocess(English, _POS_FIELDS)
-def to_sub(nlp, sent, doc, flds):
+@nlp_preprocess(English)
+def to_sub(doc, **kwargs):
     '''
     finds the subject(s) of the sentence, which is the noun that is
     performing the verb(s) in the sentence
-    requires a sentence (sent) or an nlp document (doc)
     '''
 
-    return find_dep(dep=nsubj, pos=VERB, **vars())
+    return find_dep(doc=doc, dep=nsubj, pos=VERB, **kwargs)
