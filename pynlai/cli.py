@@ -96,21 +96,25 @@ def parse(ctx, sent):
 
 @main.command()
 @click.pass_context
-@click.argument('file')
-def parsefile(ctx, file):
+@click.argument('files', nargs=-1)
+def parsefile(ctx, files):
     '''
-    parse a document
+    parse document(s), globs ok
     '''
 
     nlp = ctx.obj['nlp']
 
-    with open(file, 'r') as f:
+    for f in files:
 
-        doc = nlp(f.read())
+        click.echo(f)
 
-        for sent in doc.sents:
-            click.echo(sent.text)
-            ctx.invoke(parse, sent=sent.text)
+        with open(f, 'r') as f_obj:
+
+            doc = nlp(f_obj.read())
+
+            for sent in doc.sents:
+                click.echo(sent)
+                ctx.invoke(parse, sent=sent.text)
 
 
 def entry_point():
