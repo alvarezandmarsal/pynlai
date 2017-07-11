@@ -55,13 +55,13 @@ def nl_function(*triggers):
 
     def decorator(fcn):
 
+        # associate function with triggers and vice versa
+        fcn.__pynlai_triggers = triggers
+        for t in triggers:
+            t.__pynlai_fcn = fcn.__name__
+
         @wraps(fcn)
         def wrapper(*args, **kwargs):
-
-            # associate function with triggers and vice versa
-            fcn.__pynlai_triggers = triggers
-            for t in triggers:
-                t.__pynlai_fcn = fcn.__name__
 
             return fcn(*args, **kwargs)
 
