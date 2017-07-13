@@ -32,6 +32,13 @@ from pynlai.views import (
 )
 
 
+views = {
+    'dep_span': _DEP_SPAN,
+    'dep_token': _DEP_TOKEN,
+    'ent_span': _ENT_SPAN,
+    'pos_token': _POS_TOKEN,
+}
+
 func_view = {
     'ent': (to_ent, _ENT_SPAN['HR']),
     'nc': (to_nc, _DEP_SPAN['HR']),
@@ -40,7 +47,7 @@ func_view = {
     'sub': (to_sub, _DEP_TOKEN['HR']),
 }
 
-pp = pprint.PrettyPrinter(indent=2, width=240)
+pp = pprint.PrettyPrinter(indent=4, width=200)
 
 
 @click.group()
@@ -51,19 +58,29 @@ pp = pprint.PrettyPrinter(indent=2, width=240)
     help='interactive prompt for sentence input'
 )
 @click.option(
-    '--pipeline',
+    '--pipeline', '-p',
     default=('pos',),
     multiple=True,
     type=click.Choice(func_view.keys()),
-    help='function(s) and view(s) to use for processing pipeline'
+    help='nl function(s) and paired view to use in processing pipeline'
 )
-def main(ctx, interactive, pipeline):
+@click.option(
+    '--view', '-v',
+    multiple=True,
+    type=click.Choice(views.keys()),
+    help='override paired view(s) with view(s)'
+)
+def main(ctx, interactive, pipeline, view):
     '''
     pynlai command line interface
     '''
 
+    vs = [e for v in view for e in views[v]['HR']]
+    fv = func_view if not vs else \
+         {k: (v[0], vs) for k, v in func_view.items()}
+
     ctx.obj['i'] = interactive
-    ctx.obj['pipeline'] = [func_view[k] for k in pipeline]
+    ctx.obj['pipeline'] = [fv[k] for k in pipeline]
     ctx.obj['nlp'] = en.load()
 
 

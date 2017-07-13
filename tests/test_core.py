@@ -47,7 +47,7 @@ class TestCore(unittest.TestCase):
         try:
             core.to_pos(doc=object(), nlp=nlp)
         except ValueError as e:
-            self.assertTrue('arg of text type' in str(e))
+            self.assertTrue('arg of spacy or text type' in str(e))
         r = core.to_pos(doc=Doc(nlp.vocab), nlp=nlp)
         six.assertCountEqual(self, r, [])
 

@@ -14,7 +14,7 @@ from operator import attrgetter
 import six
 
 from spacy.en import English
-from spacy.tokens import Doc
+from spacy.tokens import Doc, Span, Token
 from spacy.symbols import dobj, nsubj, VERB
 
 
@@ -47,8 +47,8 @@ def nlp_preprocess(nlp_model):
                 raise ValueError('pass args by name to %s' % name)
 
             if type(kwargs['doc']) not in (Doc, str, six.text_type):
-                m = 'must pass `doc` arg of text type or %s'
-                raise ValueError(m % type(Doc))
+                m = 'must pass `doc` arg of Doc or text type not %s'
+                raise ValueError(m % type(kwargs['doc']))
 
             if type(kwargs['nlp']) is not nlp_model:
                 m = 'must pass `nlp` arg of type %s'
