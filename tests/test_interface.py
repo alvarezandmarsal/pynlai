@@ -9,39 +9,62 @@ unit tests for pynlai interface module
 '''
 
 
+from collections import OrderedDict
 import six
 import unittest
+
+import en_core_web_sm as en
 
 import pynlai
 from pynlai import core
 from pynlai import views
 
+from .shared import *
 
-class TestCore(unittest.TestCase):
+
+class TestInterface(unittest.TestCase):
 
     def setUp(self):
-        @pynlai.nl_function(
-            pynlai.Trigger(
-                core.to_pos,
-                views._POS_TOKEN['HR'],
-                [
-                    ('orth_', 'Test'),
-                    ('pos_', 'NOUN'),
-                ],
-            ),
+        self.nl = 'Test the nl_function with a set to 1.'
+        self.trigger = pynlai.Trigger(
+            core.to_obj,
+            views._DEP_TOKEN['HR'],
+            OrderedDict([
+                ('orth_', 'nl_function'),
+                ('lemma_', 'nl_function'),
+                ('dep_', 'dobj'),
+                ('head.orth_', 'Test'),
+                ('head.lemma_', 'test'),
+                ('head.pos_', 'VERB'),
+            ]),
         )
-        def nl_test():
-            return True
-        self.nl_test = nl_test
+        def arg_callback(*args, **kwargs): return {'a': True}
+        self.argument = pynlai.Argument(
+            core.to_obj,
+            views._DEP_TOKEN['HR'],
+            OrderedDict([
+                ('orth_', 'nl_function'),
+                ('lemma_', 'nl_function'),
+                ('dep_', 'dobj'),
+                ('head.orth_', 'Test'),
+                ('head.lemma_', 'test'),
+                ('head.pos_', 'VERB'),
+            ]),
+            arg_callback,
+        )
+        @pynlai.nl_function(
+            self.trigger,
+            self.argument,
+        )
+        def nl_function(a):
+            return a
+        self.nl_function = nl_function
 
     def tearDown(self):
         pass
 
-    def test_nl_function(self):
-        a_1 = '__pynlai_triggers'
-        a_2 = '__pynlai_fcn'
-        self.assertTrue(hasattr(self.nl_test, a_1))
-        self.assertTrue(hasattr(getattr(self.nl_test, a_1)[0], a_2))
+    def test_decorator(self):
+        self.assertTrue(hasattr(self.nl_function, '__pynlai_triggers'))
 
     def test_run(self):
-        pass
+        self.assertTrue(pynlai.run(doc=self.nl, nlp=nlp, obj=self))

@@ -8,7 +8,6 @@ top-level package for pynlai.
 
 from .interface import (
     Trigger,
-    Command,
     Argument,
     nl_function,
     run,

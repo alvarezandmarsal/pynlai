@@ -20,8 +20,7 @@ from pynlai import cli
 from pynlai import core
 from pynlai import views
 
-
-nlp = en.load()
+from .shared import *
 
 
 class TestCore(unittest.TestCase):
