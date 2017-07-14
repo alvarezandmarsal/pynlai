@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+'''
+setup
+-----
+
+The pynlai setup script.
+'''
+
 
 from setuptools import setup, find_packages
 
-with open('README') as readme_file:
+
+with open('README.md') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
+with open('HISTORY') as history_file:
     history = history_file.read()
 
 requirements = [
@@ -24,14 +31,27 @@ test_requirements = [
     'mock',
 ]
 
+DESCRIPTION = 'PYthon Natural Language Application Interface library.'
+
+LONG_DESCRIPTION = '''
+pynlai was created to provide a way for non-technical users to interact
+with backend applications using natural language. Developers can simply
+write an app and use pynlai to process text commands from any source
+(e.g. irc, slack, email, etc.) by decorating their functions with natural
+language triggers.
+
+For more information and a guide for getting started, please see our
+repo on github linked below.
+'''
+
 setup(
     name='pynlai',
-    version='0.1.0',
+    version='0.1.2',
     description="PYthon Natural Language Application Interface library.",
-    long_description=readme + '\n\n' + history,
+    long_description=LONG_DESCRIPTION + '\n\n' + history,
     author="Chris Pappalardo",
-    author_email='cpappala@yahoo.com',
-    url='https://github.com/ChrisPappalardo/pynlai',
+    author_email='cpappalardo@alvarezandmarsal.com',
+    url='https://github.com/alvarezandmarsal/pynlai',
     packages=find_packages(include=['pynlai']),
     entry_points={
         'console_scripts': [
