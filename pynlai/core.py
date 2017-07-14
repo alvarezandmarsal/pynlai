@@ -14,7 +14,7 @@ from operator import attrgetter
 import six
 
 from spacy.en import English
-from spacy.tokens import Doc, Span, Token
+from spacy.tokens import Doc
 from spacy.symbols import dobj, nsubj, VERB
 
 

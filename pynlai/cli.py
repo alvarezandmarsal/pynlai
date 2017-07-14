@@ -75,9 +75,11 @@ def main(ctx, interactive, pipeline, view):
     pynlai command line interface
     '''
 
-    vs = [e for v in view for e in views[v]['HR']]
-    fv = func_view if not vs else \
-         {k: (v[0], vs) for k, v in func_view.items()}
+    if view:
+        vs = [e for v in view for e in views[v]['HR']]
+        fv = {k: (v[0], vs) for k, v in func_view.items()}
+    else:
+        fv = func_view
 
     ctx.obj['i'] = interactive
     ctx.obj['pipeline'] = [fv[k] for k in pipeline]
