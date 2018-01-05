@@ -13,7 +13,7 @@ from functools import wraps
 from operator import attrgetter
 import six
 
-from spacy.en import English
+from spacy.lang.en import English
 from spacy.tokens import Doc
 from spacy.symbols import dobj, nsubj, VERB
 

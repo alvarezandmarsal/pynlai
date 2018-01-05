@@ -11,7 +11,7 @@ collection for building natural language app interfaces
 from functools import wraps
 from inspect import getmembers
 
-from spacy.en import English
+from spacy.lang.en import English
 
 from pynlai import core
 
