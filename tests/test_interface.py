@@ -63,5 +63,31 @@ class TestInterface(unittest.TestCase):
         self.assertTrue(hasattr(self.nl_function, '__pynlai_triggers'))
 
     def test_run(self):
+        r = pynlai.run(doc='Test sentence.', nlp=nlp, obj=self)
+        self.assertEqual(r, None)
+
+    def test_run_full_match(self):
         r = pynlai.run(doc=self.nl, nlp=nlp, obj=self)
         self.assertEqual(r, u'1')
+
+    def test_run_partial_match(self):
+
+        nl = 'Test the nl_function with a partial match and value set to 2.'
+        trigger = pynlai.Trigger(
+            core.to_obj,
+            views._DEP_TOKEN['HR'],
+            OrderedDict([
+                ('head.lemma_', 'test'),
+                ('head.pos_', 'VERB'),
+            ]),
+        )
+        @pynlai.nl_function(
+            self.trigger,
+            self.argument,
+        )
+        def nl_function(value):
+            return value
+        self.nl_function = nl_function
+
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, u'2')
