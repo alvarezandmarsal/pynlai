@@ -31,6 +31,19 @@ project_root = os.path.dirname(cwd)
 # version is used.
 sys.path.insert(0, project_root)
 
+# mock out dependencies because RTD
+from unittest.mock import MagicMock
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = ['spacy.lang.en', 'spacy.tokens', 'spacy.tokens.doc',
+                'spacy.vocab', 'spacy.morphology', 'spacy.gold',
+                'en-core-web-sm']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 import pynlai
 
 # -- General configuration ---------------------------------------------
