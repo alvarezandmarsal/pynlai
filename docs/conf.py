@@ -42,12 +42,10 @@ class Mock(MagicMock):
 MOCK_MODULES = [
     'click',
     'en_core_web_sm',
+    'spacy',
+    'spacy.lang',
     'spacy.lang.en',
     'spacy.tokens',
-    'spacy.tokens.doc',
-    'spacy.vocab',
-    'spacy.morphology',
-    'spacy.gold',
     'spacy.symbols',
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
