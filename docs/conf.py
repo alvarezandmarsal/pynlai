@@ -32,16 +32,24 @@ project_root = os.path.dirname(cwd)
 sys.path.insert(0, project_root)
 
 # mock out dependencies because RTD
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
         return MagicMock()
 
-MOCK_MODULES = ['spacy.lang.en', 'spacy.tokens', 'spacy.tokens.doc',
-                'spacy.vocab', 'spacy.morphology', 'spacy.gold',
-                'en-core-web-sm']
+MOCK_MODULES = [
+    'click',
+    'en_core_web_sm',
+    'spacy.lang.en',
+    'spacy.tokens',
+    'spacy.tokens.doc',
+    'spacy.vocab',
+    'spacy.morphology',
+    'spacy.gold',
+    'spacy.symbols',
+]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 import pynlai
