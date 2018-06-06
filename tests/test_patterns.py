@@ -45,3 +45,9 @@ class TestPatterns(unittest.TestCase):
         self.nl_function = nl_function
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
         self.assertEqual(r, '<@U8CR3QZ7G>')
+        @patterns.command_regex('meet', 'name', '<@([A-Z0-9]{9})>')
+        def nl_function(name):
+            return name
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, 'U8CR3QZ7G')

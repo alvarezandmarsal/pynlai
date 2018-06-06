@@ -71,7 +71,10 @@ def command_regex(verb, target, pattern):
     def _callback(sent):
         r = re.search(pattern, sent)
 
-        if r:
+        if r and r.groups():
+            return dict([(target, r.groups()[-1])])
+
+        elif r:
             return dict([(target, r.group(0))])
 
         return dict([(target, '')])
