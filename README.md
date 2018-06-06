@@ -186,7 +186,7 @@ from pynlai.patterns import command
 nlp = en.load()
 
 
-@command('meet', 'julio', nlp)
+@command('meet', 'name', nlp)
 def nl_function(name):
     return name
 
