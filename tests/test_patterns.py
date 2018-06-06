@@ -28,6 +28,43 @@ class TestPatterns(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_verb(self):
+        nl = 'meet julio'
+        @patterns.verb('meet')
+        def nl_function():
+            return 'it works!'
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, 'it works!')
+
+    def test_d_object(self):
+        nl = 'meet julio'
+        @patterns.verb('meet')
+        @patterns.d_object('meet', 'name', nlp)
+        def nl_function(name):
+            return name
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, 'julio')
+
+    def test_regex(self):
+        nl = 'meet <@U8BEWRQV7>'
+        @patterns.verb('meet')
+        @patterns.regex('<@[A-Z0-9]{9}>', 'name')
+        def nl_function(name):
+            return name
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, '<@U8BEWRQV7>')
+        nl = 'meet <@U8CR3QZ7G>'
+        @patterns.verb('meet')
+        @patterns.regex('<@([A-Z0-9]{9})>', 'name')
+        def nl_function(name):
+            return name
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertEqual(r, 'U8CR3QZ7G')
+
     def test_command(self):
         nl = 'meet julio'
         @patterns.command('meet', 'name', nlp)
@@ -36,18 +73,3 @@ class TestPatterns(unittest.TestCase):
         self.nl_function = nl_function
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
         self.assertEqual(r, 'julio')
-
-    def test_command_regex(self):
-        nl = 'meet <@U8CR3QZ7G>'
-        @patterns.command_regex('meet', 'name', '<@[A-Z0-9]{9}>')
-        def nl_function(name):
-            return name
-        self.nl_function = nl_function
-        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, '<@U8CR3QZ7G>')
-        @patterns.command_regex('meet', 'name', '<@([A-Z0-9]{9})>')
-        def nl_function(name):
-            return name
-        self.nl_function = nl_function
-        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, 'U8CR3QZ7G')

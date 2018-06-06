@@ -20,7 +20,7 @@ write an app and use pynlai to process text commands from any source
 (e.g. irc, slack, email, etc.) by decorating their functions with
 natural language triggers.
 
-## Getting started
+## Quickstart
 
 To get started with pynlai, you first need to have an idea of the types
 of command sentences you expect from your users and how those sentences
@@ -111,7 +111,6 @@ We can then set up the pynlai triggers and decorate our app function
 as follows:
 
 ```python
-
 from collections import OrderedDict
 import sys
 
@@ -167,4 +166,31 @@ like so:
 ```python
 nl = 'Test the nl_function with value set to 1.'
 pynlai.run(doc=nl, nlp=nlp, obj=sys.modules[__name__])  # returns 1
+```
+
+## (An Even Quicker) Quickstart
+
+Since certain natural language patterns are common and re-occur, we
+have implemented several simple pattern decorators that you can use
+instead, like so:
+
+```python
+import sys
+
+import en_core_web_sm as en
+
+import pynlai
+from pynlai.patterns import command
+
+
+nlp = en.load()
+
+
+@command('meet', 'julio', nlp)
+def nl_function(name):
+    return name
+
+
+nl = 'meet julio'
+pynlai.run(doc=nl, nlp=nlp, obj=sys.modules[__name__])  # returns julio
 ```

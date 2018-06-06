@@ -52,7 +52,8 @@ def nl_function(*triggers):
     def decorator(fcn):
 
         # inject triggers into decorated function
-        setattr(fcn, '__pynlai_triggers', triggers)
+        t = getattr(fcn, '__pynlai_triggers', ())
+        setattr(fcn, '__pynlai_triggers', t + triggers)
 
         @wraps(fcn)
         def wrapper(*args, **kwargs):
