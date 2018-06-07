@@ -21,6 +21,7 @@ def verb(verb):
     a simple verb trigger pattern
     '''
 
+    # pos pipeline is more encompassing
     pos_fcn, pos_fields = func_view['pos']
     trigger = Trigger(
         pos_fcn,
@@ -39,20 +40,22 @@ def d_object(verb, key, nlp):
     a simple direct object of a verb argument pattern
     '''
 
-    obj_fcn, obj_fields = func_view['obj']
+    # nc pipeline gives better NLP, use regex for encoded objs
+    nc_fcn, nc_fields = func_view['nc']
 
     def _callback(sent):
-        obj = obj_fcn(doc=sent, nlp=nlp).pop()
-        view = create_view(obj, obj_fields)
+        nc = nc_fcn(doc=sent, nlp=nlp).pop()
+        view = create_view(nc, nc_fields)
 
-        return dict([(key, view['orth_'])])
+        return dict([(key, view['text'])])
 
     trigger = Argument(
-        obj_fcn,
-        obj_fields,
+        nc_fcn,
+        nc_fields,
         OrderedDict([
-            ('dep_', 'dobj'),
-            ('head.lemma_', verb),
+            ('root.dep_', 'dobj'),
+            ('root.head.lemma_', verb),
+            ('root.head.pos_', 'VERB'),
         ]),
         _callback,
     )
@@ -89,19 +92,19 @@ def regex(pattern, key):
 
 def command(verb, target, nlp):
     '''
-    a simple verb > target command phrase pattern
+    a simple verb > target command phrase pattern (legacy)
     ex:  meet julio
+    note:  better to compose with verb, d_object, etc.
     '''
 
     pos_fcn, pos_fields = func_view['pos']
-    obj_fcn, obj_fields = func_view['obj']
+    nc_fcn, nc_fields = func_view['nc']
 
     def _callback(sent):
-        obj_fcn, obj_fields = func_view['obj']
-        obj = obj_fcn(doc=sent, nlp=nlp).pop()
-        view = create_view(obj, obj_fields)
+        nc = nc_fcn(doc=sent, nlp=nlp).pop()
+        view = create_view(nc, nc_fields)
 
-        return dict([(target, view['orth_'])])
+        return dict([(target, view['text'])])
 
     trigger = Trigger(
         pos_fcn,
@@ -113,11 +116,12 @@ def command(verb, target, nlp):
     )
 
     argument = Argument(
-        obj_fcn,
-        obj_fields,
+        nc_fcn,
+        nc_fields,
         OrderedDict([
-            ('dep_', 'dobj'),
-            ('head.lemma_', verb),
+            ('root.dep_', 'dobj'),
+            ('root.head.lemma_', verb),
+            ('root.head.pos_', 'VERB'),
         ]),
         _callback,
     )

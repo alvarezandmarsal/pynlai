@@ -113,16 +113,12 @@ as follows:
 ```python
 from collections import OrderedDict
 import sys
-
 import en_core_web_sm as en
-
 import pynlai
 from pynlai import core
 from pynlai import views
 
-
 nlp = en.load()
-
 
 trigger = pynlai.Trigger(
     core.to_obj,
@@ -135,12 +131,10 @@ trigger = pynlai.Trigger(
     ]),
 )
 
-
 def arg_callback(sent):
     ents = core.to_ent(doc=sent, nlp=nlp).pop()
     view = core.create_view(ents, views._ENT_SPAN['HR'])
     return dict([('value', view['text'])])
-
 
 argument = pynlai.Argument(
     core.to_nc,
@@ -150,7 +144,6 @@ argument = pynlai.Argument(
     ]),
     arg_callback,
 )
-
 
 @pynlai.nl_function(
     trigger,
@@ -171,25 +164,32 @@ pynlai.run(doc=nl, nlp=nlp, obj=sys.modules[__name__])  # returns 1
 ## (An Even Quicker) Quickstart
 
 Since certain natural language patterns are common and re-occur, we
-have implemented several simple pattern decorators that you can use
-instead, like so:
+have implemented several pattern decorators that you can use instead,
+like so:
 
 ```python
 import sys
-
 import en_core_web_sm as en
-
 import pynlai
 from pynlai.patterns import command
 
-
 nlp = en.load()
-
 
 @command('meet', 'name', nlp)
 def nl_function(name):
     return name
 
+nl = 'meet julio'
+pynlai.run(doc=nl, nlp=nlp, obj=sys.modules[__name__])  # returns julio
+```
+
+Or you can compose them:
+
+```python
+@verb('meet')
+@d_object('meet', 'name', nlp)
+def nl_function(name):
+    return name
 
 nl = 'meet julio'
 pynlai.run(doc=nl, nlp=nlp, obj=sys.modules[__name__])  # returns julio

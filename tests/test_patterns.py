@@ -9,6 +9,7 @@ unit tests for pynlai patterns module
 '''
 
 
+from random import randint, shuffle
 import six
 import unittest
 
@@ -29,13 +30,17 @@ class TestPatterns(unittest.TestCase):
         pass
 
     def test_verb(self):
-        nl = 'meet julio'
-        @patterns.verb('meet')
-        def nl_function():
-            return 'it works!'
-        self.nl_function = nl_function
-        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, 'it works!')
+        nl = 'meet %s'
+        chars = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        for i in range(0, 100):
+            shuffle(chars)
+            rnd = randint(4, 20)
+            @patterns.verb('meet')
+            def nl_function():
+                return 'hello somebody'
+            self.nl_function = nl_function
+            r = pynlai.run(doc=nl % chars[:rnd], nlp=nlp, obj=self)
+            self.assertEqual(r, 'hello somebody')
 
     def test_d_object(self):
         nl = 'meet julio'
@@ -48,22 +53,17 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(r, 'julio')
 
     def test_regex(self):
-        nl = 'meet <@U8BEWRQV7>'
-        @patterns.verb('meet')
-        @patterns.regex('<@[A-Z0-9]{9}>', 'name')
-        def nl_function(name):
-            return name
-        self.nl_function = nl_function
-        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, '<@U8BEWRQV7>')
-        nl = 'meet <@U8CR3QZ7G>'
-        @patterns.verb('meet')
-        @patterns.regex('<@([A-Z0-9]{9})>', 'name')
-        def nl_function(name):
-            return name
-        self.nl_function = nl_function
-        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, 'U8CR3QZ7G')
+        # slack ids known to cause nlp issues
+        for u in ('U8C3B0NBX', 'U8BEWRQV7', 'U8CR0RKV4', 'U8CR3QZ7G'):
+            for p in ('[A-Z0-9]{9}', '<@([A-Z0-9]{9})>'):
+                nl = 'meet <@%s>' % u
+                @patterns.verb('meet')
+                @patterns.regex(p, 'name')
+                def nl_function(name):
+                    return name
+                self.nl_function = nl_function
+                r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+                self.assertEqual(r, u)
 
     def test_command(self):
         nl = 'meet julio'
