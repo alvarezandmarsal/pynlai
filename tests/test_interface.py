@@ -64,7 +64,7 @@ class TestInterface(unittest.TestCase):
 
     def test_run(self):
         r = pynlai.run(doc='Test sentence.', nlp=nlp, obj=self)
-        self.assertDictEqual(r, {})
+        self.assertDictEqual(r, {'nl_function': None})
 
     def test_run_full_match(self):
         r = pynlai.run(doc=self.nl, nlp=nlp, obj=self)

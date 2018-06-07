@@ -75,7 +75,7 @@ def run(doc, nlp, obj):
     callbacks = dict()
     result = dict()
 
-    # process all pynlai triggers contained in module functions
+    # store trigger callbacks meeting criteria
     for name, fcn in getmembers(obj):
 
         if not hasattr(fcn, '__pynlai_triggers'):
@@ -83,8 +83,7 @@ def run(doc, nlp, obj):
 
         callbacks[name] = list()
 
-        # store all triggers meeting criteria
-        for t in getattr(fcn, '__pynlai_triggers'):
+        for t in getattr(fcn, '__pynlai_triggers', ()):
 
             for s in doc.sents:
 
@@ -96,16 +95,13 @@ def run(doc, nlp, obj):
                         callback = t.callback or fcn
                         callbacks[name].append((t, s.text, callback))
 
-    # handle stored triggers localized by function
-    for name in callbacks.keys():
-
-        if not callbacks[name]:
-            continue
+    # execute stored callbacks
+    for name, store in callbacks.items():
 
         args = dict()
         def command(*args, **kwargs): return None  # noqa
 
-        for trigger, sentence, callback in callbacks[name]:
+        for trigger, sentence, callback in store:
 
             if hasattr(trigger, 'argument'):
                 args.update(callback(sentence))
