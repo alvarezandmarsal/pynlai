@@ -64,11 +64,11 @@ class TestInterface(unittest.TestCase):
 
     def test_run(self):
         r = pynlai.run(doc='Test sentence.', nlp=nlp, obj=self)
-        self.assertEqual(r, None)
+        self.assertDictEqual(r, {})
 
     def test_run_full_match(self):
         r = pynlai.run(doc=self.nl, nlp=nlp, obj=self)
-        self.assertEqual(r, u'1')
+        self.assertDictEqual(r, {'nl_function': u'1'})
 
     def test_run_partial_match(self):
 
@@ -90,4 +90,17 @@ class TestInterface(unittest.TestCase):
         self.nl_function = nl_function
 
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, u'2')
+        self.assertDictEqual(r, {'nl_function': u'2'})
+
+    def test_run_multiple_fcns(self):
+
+        @pynlai.nl_function(
+            self.trigger,
+        )
+        def nl_function_two(**kwargs):
+            self.assertTrue('value' not in kwargs.keys())
+        self.nl_function_two = nl_function_two
+
+        r = pynlai.run(doc=self.nl, nlp=nlp, obj=self)
+        e = {'nl_function': u'1', 'nl_function_two': None}
+        self.assertDictEqual(r, e)

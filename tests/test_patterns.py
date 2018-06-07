@@ -40,7 +40,7 @@ class TestPatterns(unittest.TestCase):
                 return 'hello somebody'
             self.nl_function = nl_function
             r = pynlai.run(doc=nl % chars[:rnd], nlp=nlp, obj=self)
-            self.assertEqual(r, 'hello somebody')
+            self.assertDictEqual(r, {'nl_function': 'hello somebody'})
 
     def test_d_object(self):
         nl = 'meet julio'
@@ -50,7 +50,7 @@ class TestPatterns(unittest.TestCase):
             return name
         self.nl_function = nl_function
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, 'julio')
+        self.assertDictEqual(r, {'nl_function': 'julio'})
 
     def test_regex(self):
         # slack ids known to cause nlp issues
@@ -63,7 +63,7 @@ class TestPatterns(unittest.TestCase):
                     return name
                 self.nl_function = nl_function
                 r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-                self.assertEqual(r, u)
+                self.assertDictEqual(r, {'nl_function': u})
 
     def test_command(self):
         nl = 'meet julio'
@@ -72,4 +72,4 @@ class TestPatterns(unittest.TestCase):
             return name
         self.nl_function = nl_function
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
-        self.assertEqual(r, 'julio')
+        self.assertDictEqual(r, {'nl_function': 'julio'})

@@ -52,8 +52,8 @@ def nl_function(*triggers):
     def decorator(fcn):
 
         # inject triggers into decorated function
-        t = getattr(fcn, '__pynlai_triggers', ())
-        setattr(fcn, '__pynlai_triggers', t + triggers)
+        pt = getattr(fcn, '__pynlai_triggers', ())
+        setattr(fcn, '__pynlai_triggers', pt + triggers)
 
         @wraps(fcn)
         def wrapper(*args, **kwargs):
@@ -69,16 +69,22 @@ def nl_function(*triggers):
 def run(doc, nlp, obj):
     '''
     runs a natural language document through each registered object
+    and returns a dict of results by member object name
     '''
 
-    args = dict()
-    callbacks = list()
-    def command(*args, **kwargs): return None  # noqa
+    callbacks = dict()
+    result = dict()
 
-    # store callback for triggers meeting criteria
-    for _, fcn in getmembers(obj):
+    # process all pynlai triggers contained in module functions
+    for name, fcn in getmembers(obj):
 
-        for t in getattr(fcn, '__pynlai_triggers', ()):
+        if not hasattr(fcn, '__pynlai_triggers'):
+            continue
+
+        callbacks[name] = list()
+
+        # store all triggers meeting criteria
+        for t in getattr(fcn, '__pynlai_triggers'):
 
             for s in doc.sents:
 
@@ -88,15 +94,25 @@ def run(doc, nlp, obj):
 
                     if set(t.criteria.items()) <= set(nl_view.items()):
                         callback = t.callback or fcn
-                        callbacks.append((t, s.text, callback))
+                        callbacks[name].append((t, s.text, callback))
 
-    # handle stored callbacks
-    for trigger, sentence, callback in callbacks:
+    # handle stored triggers localized by function
+    for name in callbacks.keys():
 
-        if hasattr(trigger, 'argument'):
-            args.update(callback(sentence))
+        if not callbacks[name]:
+            continue
 
-        else:
-            command = callback  # noqa
+        args = dict()
+        def command(*args, **kwargs): return None  # noqa
 
-    return command(**args)
+        for trigger, sentence, callback in callbacks[name]:
+
+            if hasattr(trigger, 'argument'):
+                args.update(callback(sentence))
+
+            else:
+                command = callback  # noqa
+
+        result[name] = command(**args)
+
+    return result
