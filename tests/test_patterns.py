@@ -52,6 +52,16 @@ class TestPatterns(unittest.TestCase):
         r = pynlai.run(doc=nl, nlp=nlp, obj=self)
         self.assertDictEqual(r, {'nl_function': 'julio'})
 
+    def test_p_object(self):
+        nl = 'meet julio on the street'
+        @patterns.verb('meet')
+        @patterns.p_object('on', 'place', nlp, view_key='root.lemma_')
+        def nl_function(place):
+            return place
+        self.nl_function = nl_function
+        r = pynlai.run(doc=nl, nlp=nlp, obj=self)
+        self.assertDictEqual(r, {'nl_function': 'street'})
+
     def test_regex(self):
         # slack ids known to cause nlp issues
         for u in ('U8C3B0NBX', 'U8BEWRQV7', 'U8CR0RKV4', 'U8CR3QZ7G'):

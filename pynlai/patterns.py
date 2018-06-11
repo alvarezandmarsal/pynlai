@@ -35,9 +35,10 @@ def verb(verb):
     return nl_function(trigger)
 
 
-def d_object(verb, key, nlp):
+def _object(word, pos, dep, view_key, key, nlp):
     '''
-    a simple direct object of a verb argument pattern
+    an object meta pattern
+    ex: "meet julio" word=meet, pos=VERB, dep=dobj view_key=text > julio
     '''
 
     # nc pipeline gives better NLP, use regex for encoded objs
@@ -47,20 +48,38 @@ def d_object(verb, key, nlp):
         nc = nc_fcn(doc=sent, nlp=nlp).pop()
         view = create_view(nc, nc_fields)
 
-        return dict([(key, view['text'])])
+        return dict([(key, view[view_key])])
 
     trigger = Argument(
         nc_fcn,
         nc_fields,
         OrderedDict([
-            ('root.dep_', 'dobj'),
-            ('root.head.lemma_', verb),
-            ('root.head.pos_', 'VERB'),
+            ('root.dep_', dep),
+            ('root.head.lemma_', word),
+            ('root.head.pos_', pos),
         ]),
         _callback,
     )
 
     return nl_function(trigger)
+
+
+def d_object(verb, key, nlp, view_key='text'):
+    '''
+    a simple direct object of a verb argument pattern
+    ex: "meet julio" returns julio
+    '''
+
+    return _object(verb, 'VERB', 'dobj', view_key, key, nlp)
+
+
+def p_object(prep, key, nlp, view_key='text'):
+    '''
+    a simple object of a preposition argument pattern
+    ex: "on file" returns file
+    '''
+
+    return _object(prep, 'ADP', 'pobj', view_key, key, nlp)
 
 
 def regex(pattern, key):
