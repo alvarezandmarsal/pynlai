@@ -36,8 +36,8 @@ class TestInterface(unittest.TestCase):
                 ('head.pos_', 'VERB'),
             ]),
         )
-        def arg_callback(sent):
-            ents = core.to_ent(doc=sent, nlp=nlp).pop()
+        def arg_callback(sentence, *args):
+            ents = core.to_ent(doc=sentence, nlp=nlp).pop()
             view = core.create_view(ents, views._ENT_SPAN['HR'])
             return dict([('value', view['text'])])
         self.argument = pynlai.Argument(

@@ -43,7 +43,7 @@ class TestPatterns(unittest.TestCase):
             self.assertDictEqual(r, {'nl_function': 'hello somebody'})
 
     def test_d_object(self):
-        nl = 'meet julio'
+        nl = 'meet julio on the street'
         @patterns.verb('meet')
         @patterns.d_object('meet', 'name', nlp)
         def nl_function(name):

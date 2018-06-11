@@ -93,7 +93,7 @@ def run(doc, nlp, obj):
 
                     if set(t.criteria.items()) <= set(nl_view.items()):
                         callback = t.callback or fcn
-                        callbacks[name].append((t, s.text, callback))
+                        callbacks[name].append((s.text, t, e, callback))
 
     # execute stored callbacks
     for name, store in callbacks.items():
@@ -101,10 +101,10 @@ def run(doc, nlp, obj):
         args = dict()
         def command(*args, **kwargs): return None  # noqa
 
-        for trigger, sentence, callback in store:
+        for sentence, trigger, match, callback in store:
 
             if hasattr(trigger, 'argument'):
-                args.update(callback(sentence))
+                args.update(callback(sentence, trigger, match))
 
             else:
                 command = callback  # noqa

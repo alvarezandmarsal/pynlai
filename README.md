@@ -131,9 +131,8 @@ trigger = pynlai.Trigger(
     ]),
 )
 
-def arg_callback(sent):
-    ents = core.to_ent(doc=sent, nlp=nlp).pop()
-    view = core.create_view(ents, views._ENT_SPAN['HR'])
+def arg_callback(sentence, trigger, match):
+    view = core.create_view(match, trigger.view)
     return dict([('value', view['text'])])
 
 argument = pynlai.Argument(

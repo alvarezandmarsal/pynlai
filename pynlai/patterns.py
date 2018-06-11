@@ -44,10 +44,8 @@ def _object(word, pos, dep, view_key, key, nlp):
     # nc pipeline gives better NLP, use regex for encoded objs
     nc_fcn, nc_fields = func_view['nc']
 
-    def _callback(sent):
-        nc = nc_fcn(doc=sent, nlp=nlp).pop()
-        view = create_view(nc, nc_fields)
-
+    def _callback(sentence, trigger, match):
+        view = create_view(match, trigger.view)
         return dict([(key, view[view_key])])
 
     trigger = Argument(
@@ -87,8 +85,8 @@ def regex(pattern, key):
     a simple regex argument pattern
     '''
 
-    def _callback(sent):
-        r = re.search(pattern, sent)
+    def _callback(sentence, *args):
+        r = re.search(pattern, sentence)
 
         if r and r.groups():
             return dict([(key, r.groups()[-1])])
@@ -119,10 +117,8 @@ def command(verb, target, nlp):
     pos_fcn, pos_fields = func_view['pos']
     nc_fcn, nc_fields = func_view['nc']
 
-    def _callback(sent):
-        nc = nc_fcn(doc=sent, nlp=nlp).pop()
-        view = create_view(nc, nc_fields)
-
+    def _callback(sentence, trigger, match):
+        view = create_view(match, trigger.view)
         return dict([(target, view['text'])])
 
     trigger = Trigger(
